@@ -3,13 +3,18 @@ package controllers;
 import backEnd.UserRepository;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 import models.User;
 
 import javax.swing.*;
+import java.io.IOException;
 
 public class LoginAndRegistrationWindowController {
 
@@ -46,9 +51,35 @@ public class LoginAndRegistrationWindowController {
     @FXML
     private Button confirmRegistrationButton;
 
+    UserRepository userRepository = new UserRepository();
 
-    public void signInButtonClicked(ActionEvent actionEvent) {
 
+    public void signInButtonClicked(ActionEvent actionEvent) throws IOException {
+        signInButton.getScene().getWindow().hide();
+        try {
+            User user = userRepository.login(usernameTextField.getText(), passwordField.getText());
+            if (user != null) {
+                userRepository.setUser(user);
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../frontEnd/mainWindow.fxml"));
+                Parent parent = fxmlLoader.load();
+                Stage stage = new Stage();
+                stage.setTitle(user.getUsername());
+                stage.setScene(new Scene(parent));
+                stage.setResizable(false);
+                stage.show();
+            }
+            else {
+                throw new Exception("user = null");
+            }
+        }
+        catch (Exception exception) {
+            JOptionPane.showMessageDialog(null, exception.getMessage());
+            Parent parent = FXMLLoader.load(getClass().getResource("../frontEnd/login&RegistrationWindow.fxml"));
+            Stage stage = new Stage();
+            stage.setTitle("Sign in | Sign up");
+            stage.setScene(new Scene(parent));
+            stage.show();
+        }
     }
 
     public void signUpButtonClicked(ActionEvent actionEvent) {
@@ -62,7 +93,6 @@ public class LoginAndRegistrationWindowController {
     }
 
     public void confirmRegistrationButtonClicked(ActionEvent actionEvent) {
-        UserRepository userRepository = new UserRepository();
         try {
             userRepository.register(usernameForRegistrationTextField.getText(), passwordForRegistrationField.getText(), confirmPasswordField.getText());
             JOptionPane.showMessageDialog(null, "Registration successful!");

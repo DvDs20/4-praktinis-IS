@@ -8,6 +8,7 @@ import security.HashPassword;
 
 import javax.swing.*;
 import java.io.ByteArrayInputStream;
+import java.io.CharArrayReader;
 import java.io.Reader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,10 +21,7 @@ public class UserRepository {
 
     public void register(String username, String newPassword, String againNewPassword) throws Exception {
 
-        String hashedNewPassword = HashPassword.BCryptPassword(newPassword);
-        byte[] passwordByte = hashedNewPassword.getBytes();
-        String hashedAgainNewPassword = HashPassword.BCryptPassword(againNewPassword);
-
+        String hashedPassword = HashPassword.hashPassword(newPassword);
 
         String sql = "SELECT * FROM " + ConstantForDB.USER_TABLE + " WHERE " + ConstantForDB.USER_USERNAME + " =?";
         PreparedStatement preparedStatement = dataBaseConnection.getConnection().prepareStatement(sql);
@@ -51,7 +49,7 @@ public class UserRepository {
         try {
             PreparedStatement preparedStatement1 = dataBaseConnection.getConnection().prepareStatement(sqlStringForRegistration);
             preparedStatement1.setString(1, username);
-            preparedStatement1.setBinaryStream(2, new ByteArrayInputStream(passwordByte), passwordByte.length);
+            preparedStatement1.setString(2, hashedPassword);
 
             preparedStatement1.executeUpdate();
             preparedStatement1.close();
@@ -61,17 +59,16 @@ public class UserRepository {
         }
     }
 
-    public  void login (String username, String password) throws SQLException, ClassNotFoundException {
+    public User login (String username, String password) throws Exception {
         User user = null;
 
-        String hashedPassword = HashPassword.BCryptPassword(password);
-        byte[] passwordByte = hashedPassword.getBytes();
+        String hashedPassword = HashPassword.hashPassword(password);
 
         String sql = "SELECT * FROM " + ConstantForDB.USER_TABLE + " WHERE " + ConstantForDB.USER_USERNAME + "=? AND " +
                 ConstantForDB.USER_PASSWORD + "=?";
         PreparedStatement preparedStatement = dataBaseConnection.getConnection().prepareStatement(sql);
         preparedStatement.setString(1, username);
-        preparedStatement.setBinaryStream(2, new ByteArrayInputStream(passwordByte), passwordByte.length);
+        preparedStatement.setString(2, hashedPassword);
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -82,7 +79,18 @@ public class UserRepository {
 
             int userID = resultSet.getInt(ConstantForDB.USER_ID);
             String surname = resultSet.getString(ConstantForDB.USER_USERNAME);
-            byte[] passwordByte1 = resultSet.getBytes(ConstantForDB.USER_PASSWORD);
+            String password1 = resultSet.getString(ConstantForDB.USER_PASSWORD);
+
+            user = new User(userID, surname, password1);
         }
+        if (number == 0 || !hashedPassword.equals(user.getPassword())) {
+            throw new Exception("Login incorrect");
+        }
+        resultSet.close();
+        return user;
+    }
+
+    public void setUser (User user) {
+        UserRepository.user = user;
     }
 }
