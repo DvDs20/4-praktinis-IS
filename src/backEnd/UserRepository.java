@@ -7,9 +7,10 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import security.HashPassword;
 
 import javax.swing.*;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.Reader;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

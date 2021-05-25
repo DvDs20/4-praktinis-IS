@@ -12,9 +12,16 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import models.User;
+import security.EncryptDecryptFile;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class LoginAndRegistrationWindowController {
 
@@ -60,6 +67,7 @@ public class LoginAndRegistrationWindowController {
             User user = userRepository.login(usernameTextField.getText(), passwordField.getText());
             if (user != null) {
                 userRepository.setUser(user);
+                EncryptDecryptFile.decryptFile("C:\\Users\\deivi\\Documents\\Informacijos saugumas\\4 praktinis darbas\\UsersFiles\\" + user.getUsername() + ".txt");
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../frontEnd/mainWindow.fxml"));
                 Parent parent = fxmlLoader.load();
                 Stage stage = new Stage();
@@ -95,6 +103,16 @@ public class LoginAndRegistrationWindowController {
     public void confirmRegistrationButtonClicked(ActionEvent actionEvent) {
         try {
             userRepository.register(usernameForRegistrationTextField.getText(), passwordForRegistrationField.getText(), confirmPasswordField.getText());
+            Path path = Paths.get("C:\\Users\\deivi\\Documents\\Informacijos saugumas\\4 praktinis darbas\\UsersFiles\\" + usernameForRegistrationTextField.getText() + ".txt");
+            try {
+                Path filePath = Files.createFile(path);
+                System.out.println("File created at path: " + filePath);
+            }
+            catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+            EncryptDecryptFile.encryptFile(String.valueOf(path));
+
             JOptionPane.showMessageDialog(null, "Registration successful!");
             registrationPane.setVisible(!registrationPane.isVisible());
             loginPane.setVisible(!loginPane.isVisible());
