@@ -51,7 +51,6 @@ public class UserRepository {
             PreparedStatement preparedStatement1 = dataBaseConnection.getConnection().prepareStatement(sqlStringForRegistration);
             preparedStatement1.setString(1, username);
             preparedStatement1.setString(2, hashedPassword);
-
             preparedStatement1.executeUpdate();
             preparedStatement1.close();
         }
@@ -93,5 +92,9 @@ public class UserRepository {
 
     public void setUser (User user) {
         UserRepository.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

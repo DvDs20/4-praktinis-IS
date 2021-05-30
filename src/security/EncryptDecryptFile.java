@@ -11,7 +11,6 @@ import java.util.Base64;
 public class EncryptDecryptFile {
 
     private static final String ALGORITHM = "AES";
-    private static final String TRANSFORMATION = "AES";
 
     private static final String KEY = "VerySecretKey";
     private static final String IV = "AAAASSSSDDDDFFFF";
