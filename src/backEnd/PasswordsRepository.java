@@ -8,6 +8,8 @@ import security.EncryptDecryptPassword;
 
 import javax.swing.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 public class PasswordsRepository {
@@ -109,6 +111,35 @@ public class PasswordsRepository {
             catch (IOException ioException) {
                 ioException.printStackTrace();
             }
+        }
+    }
+
+    public void deleteSelectedPassword(String fileName, String lineToDelete) throws IOException {
+
+        try {
+            File file = new File(filePath + fileName + ".txt");
+            File tempFile = new File(filePath + "fileTemp.txt");
+
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tempFile));
+
+            String currentLine;
+
+            while ((currentLine = bufferedReader.readLine()) != null) {
+                String trimmedLine = currentLine.trim();
+                if (trimmedLine.equals(lineToDelete)) continue;
+                bufferedWriter.write(currentLine + System.lineSeparator());
+                bufferedWriter.flush();
+            }
+            bufferedWriter.close();
+            bufferedReader.close();
+            Files.delete(Path.of(filePath + fileName + ".txt"));
+            if (!tempFile.renameTo(file))
+                System.out.println("could not rename file");
+
+        }
+        catch (Exception exception) {
+            exception.printStackTrace();
         }
     }
 }

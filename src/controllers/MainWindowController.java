@@ -22,6 +22,7 @@ import security.EncryptDecryptPassword;
 
 import javax.swing.*;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,6 +132,27 @@ public class MainWindowController {
     @FXML
     private TableColumn<Passwords, String> moreInformationForFindPassword;
 
+    @FXML
+    private Pane deletePasswordPane;
+
+    @FXML
+    private TableView<Passwords> deletePasswordTable;
+
+    @FXML
+    private TableColumn<Passwords, String> loginNameForDeletePassword;
+
+    @FXML
+    private TableColumn<Passwords, String> passwordForDeletePassword;
+
+    @FXML
+    private TableColumn<Passwords, String> urlForDeletePassword;
+
+    @FXML
+    private TableColumn<Passwords, String> moreInformationForDeletePassword;
+
+    @FXML
+    private Button deleteSelectedPasswordButton;
+
     PasswordsRepository passwordsRepository = new PasswordsRepository();
     UserRepository userRepository = new UserRepository();
     User user = userRepository.getUser();
@@ -152,12 +174,19 @@ public class MainWindowController {
         urlForFindPassword.setCellValueFactory(new PropertyValueFactory<Passwords, String>("url"));
         moreInformationForFindPassword.setCellValueFactory(new PropertyValueFactory<Passwords, String>("moreInformation"));
 
+        loginNameForDeletePassword.setCellValueFactory(new PropertyValueFactory<Passwords, String>("loginName"));
+        passwordForDeletePassword.setCellValueFactory(new PropertyValueFactory<Passwords, String>("password"));
+        urlForDeletePassword.setCellValueFactory(new PropertyValueFactory<Passwords, String>("url"));
+        moreInformationForDeletePassword.setCellValueFactory(new PropertyValueFactory<Passwords, String>("moreInformation"));
+
+        deletePasswordTable.setItems(PasswordsRepository.getPasswordsObservableList(user.getUsername()));
     }
 
     public void newPasswordButtonClicked(ActionEvent actionEvent) {
         newPasswordPane.setVisible(!newPasswordPane.isVisible());
         updatePasswordPane.setVisible(false);
         findPasswordPane.setVisible(false);
+        deletePasswordPane.setVisible(false);
     }
 
     public void createNewPasswordButtonClicked(ActionEvent actionEvent) throws Exception {
@@ -189,6 +218,7 @@ public class MainWindowController {
         updatePasswordPane.setVisible(!updatePasswordPane.isVisible());
         newPasswordPane.setVisible(false);
         findPasswordPane.setVisible(false);
+        deletePasswordPane.setVisible(false);
     }
 
     public void updatedSelectedPasswordButtonClicked(ActionEvent actionEvent) throws Exception {
@@ -219,6 +249,7 @@ public class MainWindowController {
         findPasswordPane.setVisible(!findPasswordPane.isVisible());
         updatePasswordPane.setVisible(false);
         newPasswordPane.setVisible(false);
+        deletePasswordPane.setVisible(false);
         List<Passwords> passwordsList = PasswordsRepository.getPasswordsObservableList(user.getUsername());
         List<Passwords> newPasswordsList = new ArrayList<>();
         this.buttons = new Button[passwordsList.size()];
@@ -260,5 +291,21 @@ public class MainWindowController {
         final ClipboardContent clipboardContent = new ClipboardContent();
         clipboardContent.putString(EncryptDecryptPassword.decryptPassword(passwords.getPassword()));
         Clipboard.getSystemClipboard().setContent(clipboardContent);
+    }
+
+    public void deleteSelectedPasswordButtonClicked(ActionEvent actionEvent) throws Exception {
+        Passwords passwords = deletePasswordTable.getSelectionModel().getSelectedItem();
+        String lineToDelete = passwords.getLoginName() + "," + passwords.getPassword() +
+                "," + passwords.getUrl() + "," + passwords.getMoreInformation();
+        passwordsRepository.deleteSelectedPassword(user.getUsername(), lineToDelete);
+        deletePasswordTable.setItems(FXCollections.observableList(PasswordsRepository.getPasswordsObservableList(user.getUsername())));
+    }
+
+    public void deletePasswordButtonClicked(ActionEvent actionEvent) throws Exception {
+        deletePasswordPane.setVisible(!deletePasswordPane.isVisible());
+        newPasswordPane.setVisible(false);
+        findPasswordPane.setVisible(false);
+        updatePasswordPane.setVisible(false);
+        deletePasswordTable.setItems(FXCollections.observableList(PasswordsRepository.getPasswordsObservableList(user.getUsername())));
     }
 }
