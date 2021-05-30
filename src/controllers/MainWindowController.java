@@ -3,6 +3,7 @@ package controllers;
 import backEnd.PasswordsRepository;
 import backEnd.UserRepository;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,10 +18,15 @@ import models.User;
 import security.EncryptDecryptFile;
 import security.EncryptDecryptPassword;
 
+import javax.swing.*;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainWindowController {
+
+    @FXML
+    private Pane findPasswordPane;
 
     @FXML
     private Label passwordInDotsLabel;
@@ -105,10 +111,27 @@ public class MainWindowController {
     @FXML
     private TableColumn<Passwords, String> moreInformation;
 
+    @FXML
+    private TableView<Passwords> findPasswordTable;
+
+    @FXML
+    private TableColumn<Passwords, String> loginNameForFindPassword;
+
+    @FXML
+    private TableColumn<Passwords, Button> passwordForFindPassword;
+
+    @FXML
+    private TableColumn<Passwords, String> urlForFindPassword;
+
+    @FXML
+    private TableColumn<Passwords, String> moreInformationForFindPassword;
+
     PasswordsRepository passwordsRepository = new PasswordsRepository();
     UserRepository userRepository = new UserRepository();
     User user = userRepository.getUser();
     private List<Passwords> passwordsList;
+    List<Passwords> passwordsList1 = PasswordsRepository.getPasswordsObservableListForFindPassword(user.getUsername());
+    Button[] buttons;
 
     @FXML
     public void initialize() throws Exception {
@@ -118,11 +141,18 @@ public class MainWindowController {
         moreInformation.setCellValueFactory(new PropertyValueFactory<Passwords, String>("moreInformation"));
 
         passwordsListTable.setItems(PasswordsRepository.getPasswordsObservableList(user.getUsername()));
+
+        loginNameForFindPassword.setCellValueFactory(new PropertyValueFactory<Passwords, String>("loginName"));
+        passwordForFindPassword.setCellValueFactory(new PropertyValueFactory<Passwords, Button>("button"));
+        urlForFindPassword.setCellValueFactory(new PropertyValueFactory<Passwords, String>("url"));
+        moreInformationForFindPassword.setCellValueFactory(new PropertyValueFactory<Passwords, String>("moreInformation"));
+
     }
 
     public void newPasswordButtonClicked(ActionEvent actionEvent) {
         newPasswordPane.setVisible(!newPasswordPane.isVisible());
         updatePasswordPane.setVisible(false);
+        findPasswordPane.setVisible(false);
     }
 
     public void createNewPasswordButtonClicked(ActionEvent actionEvent) throws Exception {
@@ -153,6 +183,7 @@ public class MainWindowController {
     public void updatePasswordButtonClicked(ActionEvent actionEvent) throws FileNotFoundException {
         updatePasswordPane.setVisible(!updatePasswordPane.isVisible());
         newPasswordPane.setVisible(false);
+        findPasswordPane.setVisible(false);
     }
 
     public void updatedSelectedPasswordButtonClicked(ActionEvent actionEvent) throws Exception {
@@ -177,5 +208,45 @@ public class MainWindowController {
         updateSelectedPasswordPane.setVisible(!updateSelectedPasswordPane.isVisible());
         passwordsListTable.setItems(FXCollections.observableList(PasswordsRepository.getPasswordsObservableList(user.getUsername())));
         passwordFieldForUpdating.clear();
+    }
+
+    public void findPasswordButtonClicked(ActionEvent actionEvent) throws Exception {
+        findPasswordPane.setVisible(!findPasswordPane.isVisible());
+        updatePasswordPane.setVisible(false);
+        newPasswordPane.setVisible(false);
+        List<Passwords> passwordsList = PasswordsRepository.getPasswordsObservableList(user.getUsername());
+        List<Passwords> newPasswordsList = new ArrayList<>();
+        this.buttons = new Button[passwordsList.size()];
+        int i = 0;
+
+        for (Passwords passwords : passwordsList) {
+            buttons[i] = new Button();
+            buttons[i].setOnAction(this::handleButtonAction);
+            newPasswordsList.add(new Passwords(passwords.getLoginName(), passwords.getPassword(), passwords.getUrl(), passwords.getMoreInformation(), buttons[i]));
+            i++;
+        }
+
+        findPasswordTable.getItems().clear();
+        findPasswordTable.getItems().addAll(newPasswordsList);
+        this.passwordsList1 = newPasswordsList;
+        passwordsList = null;
+    }
+
+    private void handleButtonAction(ActionEvent actionEvent) {
+        try {
+            int i = 0;
+            for (Passwords passwords : passwordsList1) {
+                if (actionEvent.getSource() == buttons[i]) {
+                    JOptionPane.showMessageDialog(null, "Your password: " + EncryptDecryptPassword.decryptPassword(passwords.getPassword()));
+                    break;
+                }
+                else {
+                    i++;
+                }
+            }
+        }
+        catch (Exception exception) {
+            JOptionPane.showMessageDialog(null, exception.getMessage());
+        }
     }
 }

@@ -52,6 +52,31 @@ public class PasswordsRepository {
         return passwordsObservableList;
     }
 
+    public static ObservableList<Passwords> getPasswordsObservableListForFindPassword(String fileName) {
+        try {
+            passwordsObservableList.clear();
+            Scanner scanner = new Scanner(new File(filePath + fileName + ".txt"))
+                    .useDelimiter(",|\\R");
+            while (scanner.hasNext()) {
+                String loginName = scanner.next();
+                String password = scanner.next();
+                String url = scanner.next();
+                String moreInformation = scanner.next();
+
+                Passwords passwords = new Passwords(loginName, password, url, moreInformation);
+                passwordsObservableList.add(passwords);
+            }
+
+            for (Passwords passwords : passwordsObservableList) {
+                System.out.println(passwords);
+            }
+        }
+        catch (Exception exception) {
+            System.out.println(exception.getMessage());
+        }
+        return passwordsObservableList;
+    }
+
     public static void updatePassword(String fileName, String oldPassword, String newPassword) {
         File fileToBeModified = new File(filePath + fileName + ".txt");
         String oldContent = "";

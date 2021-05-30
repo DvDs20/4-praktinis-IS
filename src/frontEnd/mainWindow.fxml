@@ -61,7 +61,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <Button fx:id="findPasswordButton" layoutX="512.0" layoutY="19.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="139.0" text="Find Password">
+            <Button fx:id="findPasswordButton" layoutX="512.0" layoutY="19.0" mnemonicParsing="false" onAction="#findPasswordButtonClicked" prefHeight="38.0" prefWidth="139.0" text="Find Password">
                <font>
                   <Font size="14.0" />
                </font>
@@ -115,6 +115,18 @@
                   <Label fx:id="currentPasswordLabel" layoutX="163.0" layoutY="100.0" text="password" visible="false" />
                </children>
             </Pane>
+         </children>
+      </Pane>
+      <Pane fx:id="findPasswordPane" layoutX="139.0" layoutY="111.0" prefHeight="636.0" prefWidth="922.0" style="-fx-border-color: #cbcbcb;" visible="false">
+         <children>
+            <TableView fx:id="findPasswordTable" layoutX="72.0" layoutY="14.0" prefHeight="314.0" prefWidth="778.0">
+              <columns>
+                <TableColumn fx:id="loginNameForFindPassword" prefWidth="145.0" text="Login name" />
+                <TableColumn fx:id="passwordForFindPassword" prefWidth="164.0" text="Password" />
+                  <TableColumn fx:id="urlForFindPassword" prefWidth="194.0" text="URL/application" />
+                  <TableColumn fx:id="moreInformationForFindPassword" prefWidth="274.0" text="More information" />
+              </columns>
+            </TableView>
          </children>
       </Pane>
    </children>
