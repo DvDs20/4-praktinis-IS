@@ -117,7 +117,7 @@
             </Pane>
          </children>
       </Pane>
-      <Pane fx:id="findPasswordPane" layoutX="139.0" layoutY="111.0" prefHeight="636.0" prefWidth="922.0" style="-fx-border-color: #cbcbcb;" visible="false">
+      <Pane fx:id="findPasswordPane" layoutX="139.0" layoutY="111.0" prefHeight="636.0" prefWidth="922.0" style="-fx-border-color: #cbcbcb;">
          <children>
             <TableView fx:id="findPasswordTable" layoutX="72.0" layoutY="14.0" prefHeight="314.0" prefWidth="778.0">
               <columns>
@@ -127,6 +127,7 @@
                   <TableColumn fx:id="moreInformationForFindPassword" prefWidth="274.0" text="More information" />
               </columns>
             </TableView>
+            <Button fx:id="copyPasswordButton" layoutX="753.0" layoutY="338.0" mnemonicParsing="false" onAction="#copyPasswordButtonClicked" text="Copy password" />
          </children>
       </Pane>
    </children>

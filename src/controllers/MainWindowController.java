@@ -11,6 +11,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import models.Passwords;
@@ -24,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainWindowController {
+
+    @FXML
+    private Button copyPasswordButton;
 
     @FXML
     private Pane findPasswordPane;
@@ -248,5 +253,12 @@ public class MainWindowController {
         catch (Exception exception) {
             JOptionPane.showMessageDialog(null, exception.getMessage());
         }
+    }
+
+    public void copyPasswordButtonClicked(ActionEvent actionEvent) throws Exception {
+        Passwords passwords = findPasswordTable.getSelectionModel().getSelectedItem();
+        final ClipboardContent clipboardContent = new ClipboardContent();
+        clipboardContent.putString(EncryptDecryptPassword.decryptPassword(passwords.getPassword()));
+        Clipboard.getSystemClipboard().setContent(clipboardContent);
     }
 }
